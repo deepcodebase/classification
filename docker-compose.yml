@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+    hvd_full:
+        build:
+            context: env/
+            dockerfile: Dockerfile
+        image: horovod:latest
+        ipc: host
+        working_dir: /code
+        command: ['sleep', 'infinity']
+        container_name: horovod_full
+
+    hvd_pytorch:
+        build:
+            context: env/
+            dockerfile: Dockerfile.pytorch
+        image: horovod:pytorch
+        ipc: host
+        working_dir: /code
+        container_name: hvd_pytorch
+        command: ['sleep', 'infinity']
+        volumes:
+            - .:/code
+            - ~/data:/data
