@@ -1,3 +1,4 @@
+# build silverhugh/horovod:full
 FROM nvidia/cuda:10.1-devel-ubuntu18.04
 
 # TensorFlow version is tightly coupled to CUDA and cuDNN so it should be selected carefully
@@ -43,15 +44,15 @@ RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
     rm get-pip.py
 
 # Install TensorFlow, Keras, PyTorch and MXNet
-RUN pip install future typing packaging
-RUN pip install tensorflow==${TENSORFLOW_VERSION} \
+RUN pip install --no-cache-dir future typing packaging
+RUN pip install --no-cache-dir tensorflow==${TENSORFLOW_VERSION} \
                 keras \
                 h5py
 
 RUN PYTAGS=$(python -c "from packaging import tags; tag = list(tags.sys_tags())[0]; print(f'{tag.interpreter}-{tag.abi}')") && \
-    pip install https://download.pytorch.org/whl/cu101/torch-${PYTORCH_VERSION}%2Bcu101-${PYTAGS}-linux_x86_64.whl \
+    pip install --no-cache-dir https://download.pytorch.org/whl/cu101/torch-${PYTORCH_VERSION}%2Bcu101-${PYTAGS}-linux_x86_64.whl \
         https://download.pytorch.org/whl/cu101/torchvision-${TORCHVISION_VERSION}%2Bcu101-${PYTAGS}-linux_x86_64.whl
-RUN pip install mxnet-cu101==${MXNET_VERSION}
+RUN pip install --no-cache-dir mxnet-cu101==${MXNET_VERSION}
 
 # Install Open MPI
 RUN mkdir /tmp/openmpi && \
@@ -79,8 +80,5 @@ RUN apt-get install -y --no-install-recommends openssh-client openssh-server && 
 RUN cat /etc/ssh/ssh_config | grep -v StrictHostKeyChecking > /etc/ssh/ssh_config.new && \
     echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config.new && \
     mv /etc/ssh/ssh_config.new /etc/ssh/ssh_config
-
-COPY . /tmp
-RUN pip install -r requirements.txt
 
 WORKDIR "/code"

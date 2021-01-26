@@ -1,0 +1,4 @@
+FROM silverhugh/hvd_pytorch
+
+COPY . /tmp
+RUN pip install --no-cache-dir -r /tmp/requirements.txt

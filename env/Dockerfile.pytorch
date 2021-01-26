@@ -1,3 +1,4 @@
+# build silverhugh/horovod:pytorch
 FROM nvidia/cuda:10.1-devel-ubuntu18.04
 
 # TensorFlow version is tightly coupled to CUDA and cuDNN so it should be selected carefully
@@ -43,7 +44,7 @@ RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
     rm get-pip.py
 
 # Install PyTorch
-RUN pip install future typing packaging h5py
+RUN pip install --no-cache-dir future typing packaging h5py
 
 RUN PYTAGS=$(python -c "from packaging import tags; tag = list(tags.sys_tags())[0]; print(f'{tag.interpreter}-{tag.abi}')") && \
     pip install https://download.pytorch.org/whl/cu101/torch-${PYTORCH_VERSION}%2Bcu101-${PYTAGS}-linux_x86_64.whl \
@@ -69,14 +70,12 @@ RUN ldconfig /usr/local/cuda/targets/x86_64-linux/lib/stubs && \
 
 # Install OpenSSH for MPI to communicate between containers
 RUN apt-get install -y --no-install-recommends openssh-client openssh-server && \
-    mkdir -p /var/run/sshd
+    mkdir -p /var/run/sshd  && \
+    rm -rf /var/lib/apt/lists/*
 
 # Allow OpenSSH to talk to containers without asking for confirmation
 RUN cat /etc/ssh/ssh_config | grep -v StrictHostKeyChecking > /etc/ssh/ssh_config.new && \
     echo "    StrictHostKeyChecking no" >> /etc/ssh/ssh_config.new && \
     mv /etc/ssh/ssh_config.new /etc/ssh/ssh_config
-
-COPY . /tmp
-RUN pip install -r /tmp/requirements.txt
 
 WORKDIR "/code"
