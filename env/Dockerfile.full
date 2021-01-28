@@ -30,18 +30,16 @@ RUN apt-get update && apt-get install -y --allow-downgrades --allow-change-held-
         libnccl-dev=${NCCL_VERSION} \
         libjpeg-dev \
         libpng-dev \
-        python${PYTHON_VERSION} \
-        python${PYTHON_VERSION}-dev \
-        python${PYTHON_VERSION}-distutils \
         librdmacm1 \
         libibverbs1 \
         ibverbs-providers
 
-RUN ln -s /usr/bin/python${PYTHON_VERSION} /usr/bin/python
-
-RUN curl -O https://bootstrap.pypa.io/get-pip.py && \
-    python get-pip.py && \
-    rm get-pip.py
+RUN wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/install-conda.sh \
+    && chmod +x /tmp/install-conda.sh \
+    && /tmp/install-conda.sh -b -f -p /usr/local \
+    && rm -f /tmp/install-conda.sh \
+    && conda install -y python=${PYTHON_VERSION} \
+    && conda clean -y --all
 
 # Install TensorFlow, Keras, PyTorch and MXNet
 RUN pip install --no-cache-dir future typing packaging
