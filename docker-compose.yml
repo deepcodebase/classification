@@ -1,23 +1,18 @@
 version: "3.9"
 services:
-    hvd_full:
+    horovod:
+        container_name: hvd
         build:
             context: env/
-            dockerfile: Dockerfile
-        image: horovod:latest
+            dockerfile: Dockerfile.local
+            args:
+                - USER_ID=${UID}
+                - GROUP_ID=${GID}
+                - USER_NAME=${USER_NAME}
+        image: hvd_local
         ipc: host
+        hostname: docker
         working_dir: /code
-        command: ['sleep', 'infinity']
-        container_name: horovod_full
-
-    hvd_pytorch:
-        build:
-            context: env/
-            dockerfile: Dockerfile.pytorch
-        image: horovod:pytorch
-        ipc: host
-        working_dir: /code
-        container_name: hvd_pytorch
         command: ['sleep', 'infinity']
         volumes:
             - .:/code

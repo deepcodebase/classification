@@ -18,9 +18,4 @@ class BaseNet(nn.Module):
         x = F.relu(self.fc1(x))
         x = F.dropout(x, training=self.training)
         x = self.fc2(x)
-        return F.log_softmax(x)
-
-    def compute_loss(self, x, target):
-        output = self.forward(x)
-        loss = F.nll_loss(output, target)
-        return loss, output
+        return F.log_softmax(x, dim=1)

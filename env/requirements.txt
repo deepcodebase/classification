@@ -1,3 +1,6 @@
-rich
+rich==9.8.2
 hpman
 hpargparse
+tensorboardX
+lmdb
+pyarrow

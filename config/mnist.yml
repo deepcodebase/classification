@@ -1,0 +1,17 @@
+batch_size: 64
+batches_per_allreduce: 1
+data_location: /data/mnist
+dataset: mnist
+epochs: 10
+fp16_allreduce: false
+gpu: 'true'
+gradient_predivide_factor: 1.0
+label: base
+log_interval: 100
+lr: 0.01
+model: basenet
+momentum: 0.5
+num_workers: 2
+restart: false
+seed: 2021
+use_adasum: false
