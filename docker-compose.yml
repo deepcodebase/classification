@@ -1,7 +1,7 @@
 version: "3.9"
 services:
-    horovod:
-        container_name: hvd
+    playground:
+        container_name: playground
         build:
             context: env/
             dockerfile: Dockerfile.local
@@ -9,11 +9,11 @@ services:
                 - USER_ID=${UID}
                 - GROUP_ID=${GID}
                 - USER_NAME=${USER_NAME}
-        image: hvd_local
+        image: pytorch_local
         ipc: host
         hostname: docker
         working_dir: /code
         command: ['sleep', 'infinity']
         volumes:
             - .:/code
-            - ~/data:/data
+            - /data1/data:/data

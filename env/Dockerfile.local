@@ -1,4 +1,4 @@
-FROM silverhugh/pytorch:1.8
+FROM deepbase/pytorch:latest
 
 ARG USER_ID=1011
 ARG GROUP_ID=1011
@@ -12,11 +12,6 @@ RUN CC="cc -mavx2" pip install -U --force-reinstall pillow-simd
 RUN addgroup --gid ${GROUP_ID} ${USER_NAME}
 RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID ${USER_NAME}
 
-command -v zsh | tee -a /etc/shells \
-    && chsh -s "$(command -v zsh)" "${USER_NAME}"
-
 USER ${USER_NAME}
 
-RUN curl https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | bash -s -- --unattended \
-    wget https://raw.githubusercontent.com/oskarkrawczyk/honukai-iterm/master/honukai.zsh-theme -O ~/.oh-my-zsh/themes/honukai.zsh-theme --no-check-certificate \
-        && sed -i.bak '/ZSH_THEME/s/\".*\"/\"honukai\"/' ~/.zshrc
+RUN curl https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | bash -s -- --unattended

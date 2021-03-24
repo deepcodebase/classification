@@ -6,9 +6,6 @@ import subprocess
 import sys
 from pathlib import Path
 
-import hpargparse
-from hpman.m import _
-
 from utils.watch import watch
 
 
@@ -29,16 +26,8 @@ def prepare_parser():
         description='The core script of experiment management.')
     subparsers = parser.add_subparsers(dest='command')
 
-    _.parse_file('.')
     add_env_parser(subparsers)
-    # add_preprocess_parser(subparsers)
-    add_train_parser(subparsers)
-    add_test_parser(subparsers)
     add_watch_parser(subparsers)
-    # add_parallel_train_parser(subparsers)
-    # add_table_parser(subparsers)
-    # add_server_parser(subparsers)
-    # add_client_parser(subparsers)
 
     return parser
 
@@ -59,40 +48,12 @@ def env(args):
         if args.build:
             command += ' --build'
     elif args.action == 'enter':
-        command = 'docker-compose exec horovod bash'
+        command = 'docker-compose exec playground zsh'
     elif args.action == 'stop':
         command = 'docker-compose stop'
     else:
         raise NotImplementedError
     execute(command)
-
-
-def add_train_parser(subparsers):
-    parser = subparsers.add_parser('train', description='Training.')
-    parser.add_argument('--run-test', action='store_true', help='')
-    hpargparse.bind(parser, _)
-
-
-def train(args):
-    if _('gpu', 'true').lower() in ['false', 'none']:
-        _.set_value('gpu', False)
-
-    from pipeline.runner import BaseRunner
-    runner = BaseRunner()
-    runner.train()
-    if args.run_test:
-        runner.test()
-
-
-def add_test_parser(subparsers):
-    parser = subparsers.add_parser('test', description='Testing.')
-    hpargparse.bind(parser, _)
-
-
-def test(args):
-    from pipeline.train_hvd import BaseRunner
-    runner = BaseRunner()
-    runner.test()
 
 
 def add_watch_parser(subparsers):
