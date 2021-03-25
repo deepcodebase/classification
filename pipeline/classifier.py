@@ -23,6 +23,7 @@ class LitClassifier(LightningModule):
         self.cfg = cfg
         self.save_hyperparameters()
         self.model = instantiate(self.cfg.model)
+        self.loss = instantiate(self.cfg.loss)
 
     def forward(self, x):
         return self.model(x)
@@ -30,7 +31,7 @@ class LitClassifier(LightningModule):
     def training_step(self, batch, batch_idx):
         images, target = batch
         output = self(images)
-        loss_train = F.cross_entropy(output, target)
+        loss_train = self.loss(output, target)
         acc1, acc5 = self.__accuracy(output, target, topk=(1, 5))
         self.log('train_loss', loss_train, on_step=True, on_epoch=True, logger=True)
         self.log('train_acc1', acc1, on_step=True, prog_bar=True, on_epoch=True, logger=True)
@@ -40,11 +41,11 @@ class LitClassifier(LightningModule):
     def validation_step(self, batch, batch_idx):
         images, target = batch
         output = self(images)
-        loss_val = F.cross_entropy(output, target)
+        loss_val = self.loss(output, target)
         acc1, acc5 = self.__accuracy(output, target, topk=(1, 5))
-        self.log('val_loss', loss_val, on_step=True, on_epoch=True)
-        self.log('val_acc1', acc1, on_step=True, prog_bar=True, on_epoch=True)
-        self.log('val_acc5', acc5, on_step=True, on_epoch=True)
+        self.log('val_loss', loss_val, on_epoch=True, logger=True)
+        self.log('val_acc1', acc1, prog_bar=True, on_epoch=True, logger=True)
+        self.log('val_acc5', acc5, on_epoch=True, logger=True)
 
     @staticmethod
     def __accuracy(output, target, topk=(1, )):

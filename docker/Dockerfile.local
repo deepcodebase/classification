@@ -12,6 +12,7 @@ RUN CC="cc -mavx2" pip install -U --force-reinstall pillow-simd
 RUN addgroup --gid ${GROUP_ID} ${USER_NAME}
 RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID ${USER_NAME}
 
-USER ${USER_NAME}
+RUN cp -r /root/.oh-my-zsh /home/${USER_NAME}/
+RUN cp /root/.zshrc /home/${USER_NAME}/
 
-RUN curl https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | bash -s -- --unattended
+USER ${USER_NAME}

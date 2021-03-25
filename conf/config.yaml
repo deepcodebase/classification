@@ -1,5 +1,6 @@
 defaults:
   - model: resnet
+  - loss: cross_entropy
   - optim: sgd
   - scheduler: step
   - dataset: imagenet

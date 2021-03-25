@@ -3,7 +3,7 @@ services:
     playground:
         container_name: playground
         build:
-            context: env/
+            context: docker/
             dockerfile: Dockerfile.local
             args:
                 - USER_ID=${UID}
