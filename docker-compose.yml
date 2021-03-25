@@ -10,6 +10,8 @@ services:
                 - GROUP_ID=${GID}
                 - USER_NAME=${USER_NAME}
         image: pytorch_local
+        environment:
+            - TZ=Asia/Shanghai
         ipc: host
         hostname: docker
         working_dir: /code
