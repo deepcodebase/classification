@@ -1,11 +1,13 @@
-import pytorch_lightning as pl
-from omegaconf import DictConfig
 import hydra
 from hydra.utils import instantiate
+from omegaconf import DictConfig
+import pytorch_lightning as pl
 
 
 @hydra.main(config_path='conf', config_name='config')
 def main(cfg: DictConfig) -> None:
+    pl._logger.handlers = []
+    pl._logger.propagate = True
     if cfg.seed is not None:
         pl.seed_everything(cfg.seed)
     model = instantiate(cfg.pipeline, cfg=cfg)
