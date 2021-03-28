@@ -1,3 +1,4 @@
+import logging
 from typing import Dict, Tuple, Any
 
 import torch
@@ -14,6 +15,9 @@ from pytorch_lightning.core import LightningModule
 from hydra.utils import instantiate
 
 
+logger = logging.getLogger(__name__)
+
+
 class LitClassifier(LightningModule):
 
     def __init__(
@@ -28,24 +32,35 @@ class LitClassifier(LightningModule):
     def forward(self, x):
         return self.model(x)
 
+    def _log_metrics(self):
+        if self.trainer.is_global_zero:
+            str_metrics = ''
+            for key, val in self.trainer.logged_metrics.items():
+                str_metrics += f'\n\t{key}: {val}'
+            logger.info(str_metrics)
+
     def training_step(self, batch, batch_idx):
         images, target = batch
         output = self(images)
         loss_train = self.loss(output, target)
         acc1, acc5 = self.__accuracy(output, target, topk=(1, 5))
-        self.log('train_loss', loss_train, on_step=True, on_epoch=True, logger=True)
-        self.log('train_acc1', acc1, on_step=True, prog_bar=True, on_epoch=True, logger=True)
-        self.log('train_acc5', acc5, on_step=True, on_epoch=True, logger=True)
+        self.log('train_loss', loss_train, on_step=True, on_epoch=True)
+        self.log('train_acc1', acc1, on_step=True, prog_bar=True, on_epoch=True)
+        self.log('train_acc5', acc5, on_step=True, on_epoch=True)
         return loss_train
-
+    
     def validation_step(self, batch, batch_idx):
         images, target = batch
         output = self(images)
         loss_val = self.loss(output, target)
         acc1, acc5 = self.__accuracy(output, target, topk=(1, 5))
-        self.log('val_loss', loss_val, on_epoch=True, logger=True)
-        self.log('val_acc1', acc1, prog_bar=True, on_epoch=True, logger=True)
-        self.log('val_acc5', acc5, on_epoch=True, logger=True)
+        self.log('val_loss', loss_val, on_epoch=True)
+        self.log('val_acc1', acc1, prog_bar=True, on_epoch=True)
+        self.log('val_acc5', acc5, on_epoch=True)
+        return loss_val
+
+    def on_validation_end(self):
+        self._log_metrics()
 
     @staticmethod
     def __accuracy(output, target, topk=(1, )):
@@ -64,8 +79,18 @@ class LitClassifier(LightningModule):
                 res.append(correct_k.mul_(100.0 / batch_size))
             return res
 
-    def test_step(self, *args, **kwargs):
-        return self.validation_step(*args, **kwargs)
+    def test_step(self, batch, batch_idx):
+        images, target = batch
+        output = self(images)
+        loss_test = self.loss(output, target)
+        acc1, acc5 = self.__accuracy(output, target, topk=(1, 5))
+        self.log('test_loss', loss_test, on_epoch=True)
+        self.log('test_acc1', acc1, prog_bar=True, on_epoch=True)
+        self.log('test_acc5', acc5, on_epoch=True)
+        return loss_test
+
+    def on_test_end(self):
+        self._log_metrics()
 
     def configure_optimizers(self):
         optimizer = instantiate(self.cfg.optim, self.parameters())

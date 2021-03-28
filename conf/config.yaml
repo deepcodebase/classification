@@ -12,15 +12,37 @@ pl_trainer:
   amp_backend: native
   amp_level: O2
   profiler: simple
-  weights_summary: top
+  weights_summary: full
   deterministic: true
   max_epochs: 90
   gpus: -1
   default_root_dir: ./
 
+logging:
+  - _target_: pytorch_lightning.loggers.TensorBoardLogger
+    save_dir: .
+    name: log
+    version: tb
+  - _target_: pytorch_lightning.loggers.CSVLogger
+    save_dir: .
+    name: log
+    version: csv
+
+callbacks:
+  - _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    dirpath: log/checkpoints
+    filename: '{epoch}-{step}-{val_acc1:.2f}'
+    save_last: true
+    monitor: val_acc1
+    save_top_k: 2
+    verbose: true
+
 run_test: true
 seed: 2021
 
+# debug / run
+mode: debug
+
 hydra:
   run:
-    dir: outputs/${dataset._target_}/${model._target_}/${now:%Y-%m-%d_%H-%M-%S}
+    dir: /outputs/${mode}/${dataset._target_}/${model._target_}/${now:%Y-%m-%d_%H-%M-%S}

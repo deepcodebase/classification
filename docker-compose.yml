@@ -19,3 +19,4 @@ services:
         volumes:
             - .:/code
             - /data1/data:/data
+            - /data2/data/train_log:/outputs
