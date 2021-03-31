@@ -32,13 +32,6 @@ class LitClassifier(LightningModule):
     def forward(self, x):
         return self.model(x)
 
-    def _log_metrics(self):
-        if self.trainer.is_global_zero:
-            str_metrics = ''
-            for key, val in self.trainer.logged_metrics.items():
-                str_metrics += f'\n\t{key}: {val}'
-            logger.info(str_metrics)
-
     def training_step(self, batch, batch_idx):
         images, target = batch
         output = self(images)
@@ -48,7 +41,7 @@ class LitClassifier(LightningModule):
         self.log('train_acc1', acc1, on_step=True, prog_bar=True, on_epoch=True)
         self.log('train_acc5', acc5, on_step=True, on_epoch=True)
         return loss_train
-    
+
     def validation_step(self, batch, batch_idx):
         images, target = batch
         output = self(images)
@@ -58,9 +51,6 @@ class LitClassifier(LightningModule):
         self.log('val_acc1', acc1, prog_bar=True, on_epoch=True)
         self.log('val_acc5', acc5, on_epoch=True)
         return loss_val
-
-    def on_validation_end(self):
-        self._log_metrics()
 
     @staticmethod
     def __accuracy(output, target, topk=(1, )):
@@ -88,6 +78,16 @@ class LitClassifier(LightningModule):
         self.log('test_acc1', acc1, prog_bar=True, on_epoch=True)
         self.log('test_acc5', acc5, on_epoch=True)
         return loss_test
+
+    def _log_metrics(self):
+        if self.trainer.is_global_zero:
+            str_metrics = ''
+            for key, val in self.trainer.logged_metrics.items():
+                str_metrics += f'\n\t{key}: {val}'
+            logger.info(str_metrics)
+
+    def on_validation_end(self):
+        self._log_metrics()
 
     def on_test_end(self):
         self._log_metrics()

@@ -5,6 +5,8 @@ defaults:
   - scheduler: step
   - dataset: imagenet
   - pipeline: classifier
+  - hydra/job_logging: colorlog
+  - hydra/hydra_logging: colorlog
 
 pl_trainer:
   accelerator: ddp
@@ -36,6 +38,8 @@ callbacks:
     monitor: val_acc1
     save_top_k: 2
     verbose: true
+  - _target_: pytorch_lightning.callbacks.LearningRateMonitor
+    logging_interval: 'step'
 
 run_test: true
 seed: 2021
