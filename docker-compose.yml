@@ -13,6 +13,7 @@ services:
         environment:
             - TZ=Asia/Shanghai
         ipc: host
+        network_mode: host
         hostname: docker
         working_dir: /code
         command: ['sleep', 'infinity']
