@@ -18,5 +18,5 @@ services:
         command: ['sleep', 'infinity']
         volumes:
             - .:/code
-            - /data1/data:/data
-            - /data2/data/train_log:/outputs
+            - /DATA/disk2/xlm/data:/data
+            - /DATA/disk3/train_log:/outputs
